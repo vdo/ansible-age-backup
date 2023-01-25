@@ -1,7 +1,7 @@
 vdo.age_backup
 ==============
 
-A role to backup remote files using [age](https://github.com/FiloSottile/age) encrypted tarballs, using user's SSH keys from GitHub.
+A role to backup remote files using [age](https://github.com/FiloSottile/age) encrypted tarballs, with user's SSH keys from GitHub.
 
 Requirements
 ------------
