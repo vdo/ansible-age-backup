@@ -1,4 +1,12 @@
 ---
 - name: Prepare
   hosts: all
-  tasks: []
+  tasks:
+    - debug:
+        msg: "OS: {{ ansible_os_family }}"
+    - name: Install age
+      ansible.builtin.shell:
+          cmd: apk update && apk add age
+      delegate_to: localhost
+      #when: ansible_os_family == 'Alpine'
+

@@ -1,19 +1,4 @@
 ---
-
-- name: Check local commands
-  ansible.builtin.command:
-    cmd: "{{ item }}"
-  register: cmds
-  delegate_to: localhost
-  with_items:
-    - "hostname"
-    - "uname -a"
-    - "ls -l"
-
-- debug:
-      msg: "{{ item.stdout }}"
-  with_items: "{{ cmds.results }}"
-
  
 - name: Check local age commands
   ansible.builtin.command:
