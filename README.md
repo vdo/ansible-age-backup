@@ -1,5 +1,5 @@
-Role Name
-=========
+vdo.age_backup
+==============
 
 A role to backup remote files using [age](https://github.com/FiloSottile/age) encrypted tarballs, using user's SSH keys from GitHub.
 
@@ -16,7 +16,13 @@ How this role works
 * Encrypts the tarballs combining the all the SSH keys of all Github users, using the URI https://github.com/{user}.keys
 * Deletes safely any unencrypted file left behind, using `shred`.
 
-The generated files will follow the pattern: `{ hostname }_{ path }_{ random string }.tgz.age`, converting any dots, slashes and asterisks, for example: `www_example_net__var_log_dmesg@_bxhlndi5.tgz.age` would be the backup of `/var/log/dmesg*` at`www.example.net`.
+The generated files will follow the pattern: `{ hostname }_{ path }_{ random string }.tgz.age`, converting any dots, slashes and asterisks, for example: `www_example_net__var_log_dmesg@_bxhlndi5.tgz.age` would be the backup of `/var/log/dmesg*` from `www.example.net`.
+
+To decrypt the backup files, use your published SSH as follows:
+
+```bash
+cat www_example_net__var_log_dmesg@_bxhlndi5.tgz.age | age -d -i ~/.ssh/id_ed25519 > www_example_net__var_log_dmesg@_bxhlndi5.tgz
+```
 
 Role Variables
 --------------
