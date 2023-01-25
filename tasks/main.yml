@@ -1,2 +1,63 @@
 ---
-# tasks file for vdo.age-backup
+
+- name: Check local age commands
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  register: results
+  changed_when: false
+  delegate_to: localhost
+  with_items:
+    - "age --version"
+    - "age-keygen --version"
+
+- name: Set backup random suffix
+  ansible.builtin.set_fact:
+    backup_random_suffix: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') }}"
+
+- name: Set backup host prefix
+  ansible.builtin.set_fact:
+    backup_host_prefix: "{{ inventory_hostname | replace('.','_') }}"
+
+- name: Create backup tarballs
+  ansible.builtin.shell:
+    cmd: "tar czf {{ remote_backup_temp_path }}/{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz {{ item }}"
+  with_items: "{{ remote_backup_paths }}"
+
+- name: Fetch tarballs
+  ansible.builtin.fetch:
+    src: "{{ remote_backup_temp_path }}/{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz"
+    dest: "{{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz"
+    flat: true
+  with_items: "{{ remote_backup_paths }}"
+
+- name: Safely delete remote tarballs
+  ansible.builtin.command:
+    cmd: "shred -uz {{ remote_backup_temp_path }}/{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz"
+  with_items: "{{ remote_backup_paths }}"  
+
+- name: Grab SSH keys from Github
+  ansible.builtin.set_fact:
+    github_ssh_keys: "{{ github_ssh_keys | default ([]) + lookup('url', 'https://github.com/'+item+'.keys', wantlist=True) | unique }}"
+  with_items: "{{ github_users }}"
+
+- name: Show
+  debug:
+    msg: "{{ github_ssh_keys }}"
+
+- name: Generate keys file
+  ansible.builtin.copy: 
+    content: "{{ github_ssh_keys | join('\n') }}" 
+    dest: "{{ local_backup_temp_path }}/age_keys"
+  delegate_to: localhost
+
+- name: Encrypt backup files
+  ansible.builtin.shell:
+    cmd: "cat {{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz | age -R {{ local_backup_temp_path }}/age_keys > {{ local_backup_destination }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz.age"
+  with_items: "{{ remote_backup_paths }}"
+  delegate_to: localhost
+
+- name: Safely delete local tarballs
+  ansible.builtin.command:
+    cmd: "shred -uz {{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz"
+  with_items: "{{ remote_backup_paths }}" 
+  delegate_to: localhost

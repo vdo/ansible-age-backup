@@ -1,2 +1,7 @@
 ---
-# defaults file for vdo.age-backup
+
+remote_backup_paths: []
+github_users: []
+remote_backup_temp_path: "/tmp"
+local_backup_temp_path: "/tmp"
+local_backup_destination: "./"
