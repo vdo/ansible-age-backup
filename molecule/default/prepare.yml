@@ -8,5 +8,3 @@
       ansible.builtin.shell:
           cmd: apk update && apk add age
       delegate_to: localhost
-      #when: ansible_os_family == 'Alpine'
-

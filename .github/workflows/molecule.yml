@@ -22,4 +22,3 @@ jobs:
           ANSIBLE_FORCE_COLOR: "1"
       - name: Show files
         run: ls -l
-
