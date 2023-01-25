@@ -5,7 +5,7 @@
     cmd: "{{ item }}"
   register: results
   changed_when: false
-  delegate_to: localhost
+  delegate_to: 127.0.0.1
   with_items:
     - "age --version"
     - "age-keygen --version"

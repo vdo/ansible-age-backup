@@ -2,9 +2,9 @@
 - name: Converge
   hosts: all
   tasks:
-    - name: "Include ansible-age-backup"
+    - name: "Include vdo.age_backup"
       include_role:
-        name: ansible-age-backup
+        name: vdo.age_backup
       vars:
         remote_backup_paths:
           - "/var/log/"
