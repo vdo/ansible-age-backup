@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: "Include vdo.age_backup"
-      include_role:
+      ansible.builtin.include_role:
         name: vdo.age_backup
       vars:
         remote_backup_paths:

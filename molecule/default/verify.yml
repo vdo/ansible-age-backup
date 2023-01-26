@@ -5,7 +5,9 @@
     - name: List generated backups
       ansible.builtin.shell: "ls -l ~/*.age"
       delegate_to: localhost
+      changed_when: false
       register: ls
 
-    - debug:
+    - name: Encrypted files output
+      ansible.builtin.debug:
         msg: "{{ ls.stdout }}"

@@ -3,7 +3,7 @@ galaxy_info:
   author: vdo
   description: Age backups with user's SSH keys from GitHub.
   license: Apache-2.0
-  min_ansible_version: 2.1
+  min_ansible_version: "2.1"
   platforms:
     - name: EL
       versions:
@@ -35,7 +35,7 @@ galaxy_info:
     - name: Debian
       versions:
         - all
-  galaxy_tags: 
+  galaxy_tags:
     - github
     - backup
     - age

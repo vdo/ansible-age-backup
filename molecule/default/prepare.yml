@@ -4,5 +4,6 @@
   tasks:
     - name: Install age
       ansible.builtin.shell:
-          cmd: apk update && apk add age
+        cmd: apk update && apk add age
+      changed_when: false
       delegate_to: localhost
