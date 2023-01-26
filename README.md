@@ -51,7 +51,7 @@ Example Playbook
       - "vdo"
       - "ahasna"
   roles:
-    - vdo.age-backup
+    - vdo.age_backup
 ```
 
 License
