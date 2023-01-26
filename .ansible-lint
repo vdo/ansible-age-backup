@@ -1,0 +1,13 @@
+---
+exclude_paths:
+  - .cache/
+  - .github/
+  - .git/
+  - .tox/
+  - '**/__pycache__/*'
+  - '**/.yamllint'
+  - '**/test.ym*l'
+skip_list:
+  # - no-changed-when
+  - command-instead-of-module
+  - galaxy[no-changelog]
