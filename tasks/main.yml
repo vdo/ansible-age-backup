@@ -3,7 +3,6 @@
 - name: Check local age commands
   ansible.builtin.command:
     cmd: "{{ item }}"
-  register: results
   changed_when: false
   delegate_to: localhost
   with_items:
@@ -40,20 +39,28 @@
     github_ssh_keys: "{{ github_ssh_keys | default ([]) + lookup('url', 'https://github.com/'+item+'.keys', wantlist=True) | unique }}"
   with_items: "{{ github_users }}"
 
-- name: Show
+- name: Show keys
   debug:
     msg: "{{ github_ssh_keys }}"
 
 - name: Generate keys file
   ansible.builtin.copy: 
     content: "{{ github_ssh_keys | join('\n') }}" 
-    dest: "{{ local_backup_temp_path }}/age_keys"
+    dest: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
   delegate_to: localhost
 
 - name: Encrypt backup files
-  ansible.builtin.shell:
-    cmd: "cat {{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz | age -R {{ local_backup_temp_path }}/age_keys > {{ local_backup_destination }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz.age"
+  ansible.builtin.shell: >
+      cat {{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/','_') | replace('*','@') }}_{{ backup_random_suffix }}.tgz 
+      | age -R {{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }} > {{ local_backup_destination }}/{{ backup_host_prefix }}_{{ item | replace('/','_') 
+      | replace('*','@') }}_{{ backup_random_suffix }}.tgz.age
   with_items: "{{ remote_backup_paths }}"
+  delegate_to: localhost
+
+- name: Delete SSH keys
+  ansible.builtin.file:
+    path: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
+    state: absent
   delegate_to: localhost
 
 - name: Safely delete local tarballs

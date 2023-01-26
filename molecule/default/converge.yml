@@ -8,6 +8,6 @@
       vars:
         remote_backup_paths:
           - "/var/log/"
-        local_backup_destination: "~/"
+        local_backup_destination: "~"
         github_users:
           - "vdo"
