@@ -2,8 +2,6 @@
 - name: Prepare
   hosts: all
   tasks:
-    - debug:
-        msg: "OS: {{ ansible_os_family }}"
     - name: Install age
       ansible.builtin.shell:
           cmd: apk update && apk add age
