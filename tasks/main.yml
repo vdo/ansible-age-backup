@@ -5,6 +5,8 @@
     cmd: "{{ item }}"
   changed_when: false
   delegate_to: localhost
+  vars:
+    ansible_become: false
   with_items:
     - "age --version"
     - "age-keygen --version"
@@ -48,13 +50,16 @@
     msg: "{{ github_ssh_keys }}"
   when:
     - age_keys_override is not defined
-  
+
 - name: Generate keys file (from GitHub keys)
   ansible.builtin.copy:
     content: "{{ github_ssh_keys | join('\n') }}"
     dest: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
     mode: 0644
   delegate_to: localhost
+  vars:
+    ansible_become: false
+  become: false
   changed_when: false
   when:
     - age_keys_override is not defined
@@ -65,6 +70,8 @@
     dest: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
     mode: 0644
   delegate_to: localhost
+  vars:
+    ansible_become: false
   changed_when: false
   when:
     - age_keys_override is defined
@@ -78,6 +85,8 @@
       | replace('*', '@') }}_{{ backup_random_suffix }}.tgz.age
   with_items: "{{ remote_backup_paths }}"
   delegate_to: localhost
+  vars:
+    ansible_become: false
   changed_when: false
 
 - name: Delete SSH keys
@@ -85,6 +94,8 @@
     path: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
     state: absent
   delegate_to: localhost
+  vars:
+    ansible_become: false
   changed_when: false
 
 - name: Safely delete local tarballs
@@ -92,4 +103,6 @@
     cmd: "shred -uz {{ local_backup_temp_path }}/{{ backup_host_prefix }}_{{ item | replace('/', '_') | replace('*', '@') }}_{{ backup_random_suffix }}.tgz"
   with_items: "{{ remote_backup_paths }}"
   delegate_to: localhost
+  vars:
+    ansible_become: false
   changed_when: false
