@@ -40,18 +40,34 @@
   ansible.builtin.set_fact:
     github_ssh_keys: "{{ github_ssh_keys | default([]) + lookup('url', 'https://github.com/' + item + '.keys', wantlist=True) | unique }}"
   with_items: "{{ github_users }}"
+  when:
+    - age_keys_override is not defined
 
 - name: Show keys
   ansible.builtin.debug:
     msg: "{{ github_ssh_keys }}"
-
-- name: Generate keys file
+  when:
+    - age_keys_override is not defined
+  
+- name: Generate keys file (from GitHub keys)
   ansible.builtin.copy:
     content: "{{ github_ssh_keys | join('\n') }}"
     dest: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
     mode: 0644
   delegate_to: localhost
   changed_when: false
+  when:
+    - age_keys_override is not defined
+
+- name: Generate keys file (from override)
+  ansible.builtin.copy:
+    content: "{{ age_keys_override }}"
+    dest: "{{ local_backup_temp_path }}/age_keys_{{ backup_random_suffix }}"
+    mode: 0644
+  delegate_to: localhost
+  changed_when: false
+  when:
+    - age_keys_override is defined
 
 - name: Encrypt backup files
   ansible.builtin.shell: >
